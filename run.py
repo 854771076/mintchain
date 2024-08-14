@@ -6,21 +6,23 @@ from apscheduler.triggers.cron import CronTrigger
 bot=MintChain_Bot()
 
 def task():
-    bot=MintChain_Bot()
-    wallet=bot.wallets[0]
-    bot.login(wallet=wallet)
-    bot.get_energy_list(wallet=wallet)
-    bot.claim_energy(wallet=wallet)
-    bot.inject_energy(wallet=wallet)
+    try:
+        wallet=bot.wallets[0]
+        bot.login(wallet=wallet)
+        bot.get_energy_list(wallet=wallet)
+        bot.claim_energy(wallet=wallet)
+        bot.inject_energy(wallet=wallet)
+    except:
+        pass
 # 创建调度器
 scheduler = BackgroundScheduler()
 
 # 定义一个每24小时执行一次的触发器
-trigger = IntervalTrigger(hours=24)
+trigger = CronTrigger(hour=0, minute=30)
 
 # 添加任务到调度器
 scheduler.add_job(task, trigger)
-bot.task()
+task()
 # 启动调度器
 scheduler.start()
 
@@ -28,6 +30,7 @@ scheduler.start()
 try:
     while True:
         time.sleep(1)
-except (KeyboardInterrupt, SystemExit):
+except Exception as e:
+    logger.error(f"{e}")
     # 关闭调度器
     scheduler.shutdown()
